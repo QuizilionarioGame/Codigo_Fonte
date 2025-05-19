@@ -12,7 +12,7 @@ export default function TabLayout() {
   const colorScheme = useColorScheme();
 
   return (
-    <Tabs
+    <Tabs 
       screenOptions={{
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
         headerShown: false,
@@ -23,21 +23,47 @@ export default function TabLayout() {
             // Use a transparent background on iOS to show the blur effect
             position: 'absolute',
           },
-          default: {},
+          default: {
+          },
         }),
+        tabBarItemStyle: {
+          marginTop: 8, // Adiciona espaço entre os ícones e o topo da tabBar
+        },
       }}>
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          title: 'Login',
+          tabBarIcon: ({ focused, size, color }) => {
+            if (focused) { 
+              return <IconSymbol size={size} name="person.fill" color={color} />;
+            }
+            return <IconSymbol size={size} name="person" color={color} />;
+             },
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="ranks"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Ranks',
+          tabBarIcon: ({ focused, size, color }) => {
+            if (focused) { 
+              return <IconSymbol size={size} name="trophy.fill" color={color} />;
+            }
+            return <IconSymbol size={size} name="trophy" color={color} />;
+             },
+        }}
+      />
+      <Tabs.Screen
+        name="fase"
+        options={{
+          title: 'Fases',
+          tabBarIcon: ({ focused, size, color }) => {
+            if (focused) { 
+              return <IconSymbol size={size} name="exclamationmark" color={color} />;
+            }
+            return <IconSymbol size={size} name="exclamationmark" color={color} />;
+             },
         }}
       />
     </Tabs>

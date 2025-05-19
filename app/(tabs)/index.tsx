@@ -1,75 +1,163 @@
+import { BlurView } from 'expo-blur';
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
+import { useRouter } from 'expo-router';
+import React, { useState } from 'react';
+import { Alert, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const router = useRouter();
 
-export default function HomeScreen() {
+  // Função simulada para checar login no banco de dados
+  // Substitua por chamada real ao backend futuramente
+  const checkLoginInDatabase = async (email: string, password: string, type: 'professor' | 'aluno') => {
+    // Simulação: sempre retorna true (login válido)
+    // Troque por sua lógica de autenticação real
+    return true;
+  };
+
+  const handleLogin = async () => {
+    // Verifica se é professor
+    if (email.endsWith('@sistemapoliedro.com.br')) {
+      // Checagem no banco de dados (simulada)
+      const isValid = await checkLoginInDatabase(email, password, 'professor');
+      if (isValid) {
+        router.replace('/homeProfessor');
+      } else {
+        Alert.alert('Erro', 'Usuário ou senha inválidos.');
+      }
+    }
+    // Verifica se é aluno
+    else if (email.endsWith('@p4ed.com')) {
+      const ra = email.split('@')[0];
+      if (!/^\d{6}$/.test(ra)) {
+        Alert.alert('Erro', 'O RA do aluno deve conter 6 dígitos.');
+        return;
+      }
+      // Checagem no banco de dados (simulada)
+      const isValid = await checkLoginInDatabase(email, password, 'aluno');
+      if (isValid) {
+        router.replace('/homeAluno');
+      } else {
+        Alert.alert('Erro', 'Usuário ou senha inválidos.');
+      }
+    }
+    // Email inválido
+    else {
+      Alert.alert('Erro', 'E-mail inválido. Use um e-mail institucional.');
+    }
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12',
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          {`Tap the Explore tab to learn more about what's included in this starter app.`}
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          {`When you're ready, run `}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ImageBackground
+      source={require('@/assets/images/fundoLogin.png')}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <BlurView intensity={20} style={styles.blur}>
+        <View style={styles.overlay}>
+          <View style={styles.poliedroIMG}>
+            <Image
+              source={require('@/assets/images/iconePoliedro.png')}
+              style={styles.logo}
+            />
+            <Text style={styles.logoText}>
+              Poliedro
+            </Text>
+          </View>
+          <View style={styles.container}>
+            <Text style={{ fontSize: 30, color: '#000', fontWeight: 'bold', marginBottom: 20 }}>
+              Login
+            </Text>
+            <TextInput
+              style={styles.input}
+              placeholder="E-mail"
+              placeholderTextColor="#888"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={email}
+              onChangeText={setEmail}
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Senha"
+              placeholderTextColor="#888"
+              secureTextEntry
+              value={password}
+              onChangeText={setPassword}
+            />
+
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
+              <Text style={styles.buttonText}>Entrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </BlurView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
+  background: {
+    flex: 1,
+  },
+  blur: {
+    flex: 1,
+  },
+  poliedroIMG:{
     flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
+    marginBottom: 30,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  container: {
+    width: '90%',
+    alignItems: 'center',
+    padding: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 10,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    resizeMode: 'contain',
+    marginRight: 10,
+  },
+  logoText: {
+    fontSize: 55,
+    color: '#FFF',
+    fontWeight: 'bold',
+  },
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#FFF',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#DDD',
+    fontSize: 16,
+  },
+  button: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#007BFF',
+    borderRadius: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
