@@ -1,0 +1,46 @@
+
+create database Quizilionario;
+use Quizilionario;
+
+
+CREATE TABLE Jogador (
+    idJogador INT PRIMARY KEY auto_increment,
+    nomeJogador VARCHAR(100) Unique not null,
+    emailAdmin VARCHAR(100) ,
+    emailAluno VARCHAR(100),
+    senhaJogador VARCHAR(100) not null,
+    CHECK (CHAR_LENGTH(nomeJogador) >= 6),
+    CHECK (CHAR_LENGTH(senhaJogador) >= 6)
+);
+
+CREATE TABLE Ranking (
+    idRanking INT PRIMARY KEY auto_increment,
+    Jogador_idJogador INT,
+    nomeJogador varchar(100),
+    qntdPontos DOUBLE,
+    qntdTempo DOUBLE,
+    FOREIGN KEY (Jogador_idJogador) REFERENCES Jogador(idJogador)
+);
+
+create table questoes(
+	idQuestoes int Unique auto_increment,
+    fase int,
+    dificuldade varchar(10),
+    pergunta varchar(500),
+    resposta1 varchar (100),
+    resposta2 varchar (100),
+    resposta3 varchar (100),
+    respostaCorreta varchar (100),
+    explicacao varchar(500),
+    primary key (idQuestoes)
+	);
+-- Após a criação da tabela questoes
+CREATE TABLE partida (
+    idpartida INT PRIMARY KEY AUTO_INCREMENT,
+    jogador_idJogador INT,
+    idQuestoes INT,
+    FOREIGN KEY (jogador_idJogador) REFERENCES Jogador(idJogador),
+    FOREIGN KEY (idQuestoes) REFERENCES questoes(idQuestoes)
+);
+
+
