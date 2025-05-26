@@ -2,12 +2,14 @@ import { useRouter } from 'expo-router';
 import React from 'react';
 import { Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function HomeProfessor() {
+export default function HomeAluno() {
   const router = useRouter();
 
   return (
     <View style={styles.container}>
       <StatusBar barStyle="light-content" backgroundColor="#1976D2" />
+
+      {/* 🔷 Header */}
       <View style={styles.header}>
         <Image
           source={require('@/assets/images/iconePoliedro.png')}
@@ -15,18 +17,28 @@ export default function HomeProfessor() {
         />
         <Text style={styles.title}>Menu Aluno</Text>
       </View>
+
+      {/* 🔷 Menu */}
       <View style={styles.menu}>
         <TouchableOpacity
           style={[styles.button, styles.buttonBlue]}
-          onPress={() => router.push('/fase')}
+          onPress={() => router.push('/home/fase')}
         >
           <Text style={styles.buttonText}>Jogar</Text>
         </TouchableOpacity>
+
         <TouchableOpacity
           style={[styles.button, styles.buttonRed]}
-          onPress={() => router.push('/rankAluno')}
+          onPress={() => router.push('/rank/rankAluno')}
         >
-          <Text style={styles.buttonText}>Estatistica do Aluno</Text>
+          <Text style={styles.buttonText}>Estatísticas do Aluno</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.button, styles.buttonYellow]}
+          onPress={() => router.replace('/')}
+        >
+          <Text style={[styles.buttonText, { color: '#000' }]}>Sair</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -36,33 +48,28 @@ export default function HomeProfessor() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F6FA', // tom claro para fundo
-    padding: 0,
-    justifyContent: 'flex-start',
+    backgroundColor: '#F5F6FA',
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1976D2', // azul Poliedro
-    paddingVertical: 32,
-    paddingHorizontal: 24,
+    backgroundColor: '#1976D2',
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 0,
+    borderBottomRightRadius: 15,
     elevation: 4,
-    marginBottom: 40,
-    paddingTop: 60,
+    justifyContent: 'center',
   },
   icon: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     marginRight: 10,
   },
   title: {
-    fontSize: 35,
+    fontSize: 30,
     fontWeight: 'bold',
-    color: 'white', 
-    textShadowOffset: { width: 0.5, height: 0.5 },
-    textShadowRadius: 1,
+    color: 'white',
   },
   menu: {
     flex: 1,
@@ -71,22 +78,25 @@ const styles = StyleSheet.create({
   },
   button: {
     width: '80%',
-    paddingVertical: 20,
+    paddingVertical: 18,
     borderRadius: 16,
-    marginBottom: 28,
+    marginBottom: 20,
     alignItems: 'center',
     elevation: 2,
   },
   buttonBlue: {
-    backgroundColor: '#1976D2', // azul Poliedro
+    backgroundColor: '#1976D2',
   },
   buttonRed: {
-    backgroundColor: '#E53935', // vermelho Poliedro
+    backgroundColor: '#E53935',
+  },
+  buttonYellow: {
+    backgroundColor: '#FFEB3B',
   },
   buttonText: {
-    color: '#fff',
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: '700',
     letterSpacing: 1,
+    color: '#fff',
   },
 });

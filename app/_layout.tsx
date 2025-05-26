@@ -1,29 +1,32 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
+import { SQLiteProvider } from 'expo-sqlite';
+import { useEffect } from 'react';
+import { createTables } from '../database/setup';
+import { verificarQuestoesPorDificuldade,testConnection, verificarSeTemQuestoes } from '@/database/testConnection';
 
-import { useColorScheme } from '@/hooks/useColorScheme';
 
-export default function RootLayout() {
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
-    SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  });
+export default function Layout() {
+  useEffect(() => {
+    
+    const testar = async () => {
+      const conectado = await testConnection();
+      console.log('🟢 Banco conectado?', conectado);
 
-  if (!loaded) {
-    // Async font loading only occurs in development.
-    return null;
-  }
+      const temQuestoes = await verificarSeTemQuestoes();
+      console.log('📋 Existem questões no banco?', temQuestoes);
+
+      const porDificuldade = await verificarQuestoesPorDificuldade();
+      console.log('📊 Dados detalhados:', porDificuldade);
+    };
+
+    testar();
+  }, []);
+
+
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="+not-found" />
-      </Stack>
-      <StatusBar style="auto" />
-    </ThemeProvider>
+    <SQLiteProvider databaseName="meuBanco.db">
+      <Stack screenOptions={{ headerShown: false }} />
+    </SQLiteProvider>
   );
 }
