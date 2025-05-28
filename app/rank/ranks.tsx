@@ -107,9 +107,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: 'bold',
     color: 'white',
+    alignItems: 'center',
   },
   listContainer: {
     paddingBottom: 20,

@@ -2,12 +2,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useQuestoesDatabase, QuestoesDatabase } from '../../database/questoesService';
 import { useRankingDatabase } from '../../database/rankingService';
-import { useLocalSearchParams } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function FaseScreen() {
   const { getQuestoesPorDificuldade } = useQuestoesDatabase();
   const { saveOrUpdateRanking } = useRankingDatabase();
+  const router = useRouter();
 
   
 
@@ -211,12 +213,18 @@ export default function FaseScreen() {
       source={require('@/assets/images/chuvaDinheiro2.png')}
       style={styles.bg}
       resizeMode="cover"
-      imageStyle={{ opacity: 0.18 }}
-    >
+      imageStyle={{ opacity: 0.18 }}>
+
       <View style={styles.overlay}>
         <Text style={{ color: '#FFD166', textAlign: 'center', marginBottom: 5, fontWeight: 'bold' }}>
           ⏱️ Tempo: {tempo}s
         </Text>
+        <Ionicons
+            name="arrow-back"
+            size={26}
+            color="#FFD166"
+            style={styles.backButton}
+            onPress={() => router.back()}/>
 
         {renderFases()}
 
@@ -372,4 +380,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
   },
+  backButton: {
+  position: 'absolute',
+  top: 10,   // 🔼 
+  left: 16,  // 🔼 
+  backgroundColor: 'rgba(15, 13, 13, 0.9)', // 🔥 
+  padding: 6,   // 🔥 
+  borderRadius: 20,
+  zIndex: 10,
+  elevation: 3, // 🔥 
+},
+
 });

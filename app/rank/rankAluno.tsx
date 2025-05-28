@@ -161,9 +161,10 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   title: {
-    fontSize: 27,
+    fontSize: 22,
     fontWeight: 'bold',
     color: 'white',
+    alignItems: 'center',
   },
   card: {
     backgroundColor: '#fff',
