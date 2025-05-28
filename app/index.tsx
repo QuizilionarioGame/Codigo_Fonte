@@ -4,6 +4,7 @@ import { useRouter } from 'expo-router';
 import React, { useState } from 'react';
 import { Alert, ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { JogadorDatabase, useJogadorDatabase } from '../database/jogadorService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
@@ -25,10 +26,14 @@ export default function LoginScreen() {
       return;
     }
 
+    await AsyncStorage.setItem('jogadorId', String(user.idJogador));
+    await AsyncStorage.setItem('nomeJogador', user.nomeJogador);
+
     // 🔥 Verificar se é admin ou aluno
     if (user.emailAdmin === email) {
       router.replace('/home/homeProfessor');
     } else if (user.emailAluno === email) {
+     
       router.replace('/home/homeAluno');
     } else {
       Alert.alert('Erro', 'Email não corresponde a uma conta válida.');
@@ -74,6 +79,10 @@ export default function LoginScreen() {
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
               <Text style={styles.buttonText}>Entrar</Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={() => router.push('./home/registroScreen')}>
+                <Text style={{ color: '#007BFF', marginTop: 10 }}>Criar conta</Text>
+            </TouchableOpacity>
+
           </View>
         </View>
       </BlurView>

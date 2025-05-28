@@ -1,36 +1,91 @@
 import React, { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
-
-// Simulação de função para buscar dados do aluno no banco de dados
-// Substitua por chamada real ao backend futuramente
-const fetchAlunoStats = async (alunoId: string) => {
-  // Exemplo de retorno simulado
-  return {
-    nome: 'João Silva',
-    email:'123456@p4ed.com',
-    ra: 123456,
-    serie: '3º Ano',
-    premioMaximo: 'R$ 1.000,00',
-    tempoTotal: '12m 30s',
-  };
-};
+import {
+  ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRankingDatabase } from '@/database/rankingService';
+import { useJogadorDatabase } from '@/database/jogadorService';
+import { useRouter } from 'expo-router';
 
 export default function RankAluno() {
+  const { getRankingByJogadorId } = useRankingDatabase();
+  const { show } = useJogadorDatabase();
+  const router = useRouter();
+
   const [stats, setStats] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Substitua '123456' pelo ID do aluno logado
-    fetchAlunoStats('123456').then((dados) => {
-      setStats(dados);
-      setLoading(false);
-    });
+    carregarEstatisticas();
   }, []);
+
+  const carregarEstatisticas = async () => {
+    try {
+      const jogadorId = await AsyncStorage.getItem('jogadorId');
+
+      if (!jogadorId) {
+        Alert.alert('Erro', 'Não foi possível identificar o aluno logado.');
+        router.replace('/'); // Redireciona para login
+        return;
+      }
+
+      const id = Number(jogadorId);
+      const jogador = await show(id);
+      const ranking = await getRankingByJogadorId(id);
+
+      if (!jogador) {
+        Alert.alert('Erro', 'Jogador não encontrado.');
+        setLoading(false);
+        return;
+      }
+
+      if (!ranking) {
+        Alert.alert('Aviso', 'Nenhuma estatística encontrada para este aluno.');
+        setStats({
+          nome: jogador.nomeJogador,
+          ra: jogador.ra,
+          serie: jogador.serie,
+          melhorPremio: 0,
+          melhorTempo: 0,
+        });
+        setLoading(false);
+        return;
+      }
+
+      setStats({
+        nome: jogador.nomeJogador,
+        ra: jogador.ra,
+        serie: jogador.serie,
+        melhorPremio: ranking.qntdPontos,
+        melhorTempo: ranking.qntdTempo,
+      });
+
+      setLoading(false);
+    } catch (error) {
+      console.log('Erro ao buscar estatísticas:', error);
+      Alert.alert('Erro', 'Falha ao carregar estatísticas.');
+      setLoading(false);
+    }
+  };
 
   if (loading) {
     return (
       <View style={styles.center}>
         <ActivityIndicator size="large" color="#1976D2" />
+      </View>
+    );
+  }
+
+  if (!stats) {
+    return (
+      <View style={styles.center}>
+        <Text style={{ fontSize: 18, color: '#333' }}>Nenhum dado encontrado.</Text>
       </View>
     );
   }
@@ -59,17 +114,12 @@ export default function RankAluno() {
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>Melhor Prêmio:</Text>
-          <Text style={styles.value}>{stats.premioMaximo}</Text>
+          <Text style={styles.value}>R$ {stats.melhorPremio}</Text>
         </View>
         <View style={styles.row}>
           <Text style={styles.label}>Melhor Tempo:</Text>
-          <Text style={styles.value}>{stats.tempoTotal}</Text>
+          <Text style={styles.value}>{stats.melhorTempo} segundos</Text>
         </View>
-      </View>
-      <View style={styles.footerDecor}>
-        <View style={[styles.circle, { backgroundColor: '#00BCD4', left: 30, bottom: 30 }]} />
-        <View style={[styles.circle, { backgroundColor: '#FFD54F', right: 40, bottom: 60 }]} />
-        <View style={[styles.circle, { backgroundColor: '#E53935', left: '45%', bottom: 10 }]} />
       </View>
     </ScrollView>
   );
@@ -92,11 +142,10 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1976D2', // azul Poliedro
+    backgroundColor: '#1976D2',
     paddingVertical: 32,
     paddingHorizontal: 24,
     borderBottomLeftRadius: 15,
-    borderBottomRightRadius: 0,
     elevation: 4,
     marginBottom: 40,
     paddingTop: 60,
@@ -110,9 +159,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 27,
     fontWeight: 'bold',
-    color: 'white', 
-    textShadowOffset: { width: 0.5, height: 0.5 },
-    textShadowRadius: 1,
+    color: 'white',
   },
   card: {
     backgroundColor: '#fff',
@@ -120,10 +167,6 @@ const styles = StyleSheet.create({
     padding: 24,
     width: '90%',
     elevation: 4,
-    shadowColor: '#1976D2',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.10,
-    shadowRadius: 8,
     marginBottom: 40,
   },
   row: {
@@ -148,20 +191,5 @@ const styles = StyleSheet.create({
     fontSize: 17,
     color: '#073B4C',
     fontWeight: '600',
-  },
-  footerDecor: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
-    height: 120,
-    zIndex: -1,
-  },
-  circle: {
-    position: 'absolute',
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    opacity: 0.18,
   },
 });

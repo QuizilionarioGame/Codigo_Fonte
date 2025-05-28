@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, Button, FlatList, StyleSheet, Alert } from 'react-native';
 import { useQuestoesDatabase, QuestoesDatabase } from '../../database/questoesService';
+import { router } from 'expo-router';
 
 export default function QuestoesScreen() {
   const { create, getAll, update, remove } = useQuestoesDatabase();
@@ -160,6 +161,9 @@ export default function QuestoesScreen() {
           </View>
         )}
       />
+      <View style={{ marginTop: 20 }}>
+              <Button title="Voltar" onPress={() => router.back()} />
+            </View>
     </View>
   );
 }

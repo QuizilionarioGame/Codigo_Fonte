@@ -1,9 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Alert, ImageBackground, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useQuestoesDatabase, QuestoesDatabase } from '../../database/questoesService';
+import { useRankingDatabase } from '../../database/rankingService';
+import { useLocalSearchParams } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function FaseScreen() {
   const { getQuestoesPorDificuldade } = useQuestoesDatabase();
+  const { saveOrUpdateRanking } = useRankingDatabase();
+
+  
 
   const [questoes, setQuestoes] = useState<QuestoesDatabase[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -14,6 +20,10 @@ export default function FaseScreen() {
   const [showFeedback, setShowFeedback] = useState(false);
   const [score, setScore] = useState(0);
 
+  const [tempo, setTempo] = useState(0);
+  const timerRef = useRef<number | null>(null);
+
+
   const prizeMoney = [
     10000, 50000, 100000, 200000,
     300000, 400000, 500000, 600000,
@@ -22,25 +32,55 @@ export default function FaseScreen() {
 
   useEffect(() => {
     carregarQuestoes();
+    iniciarCronometro();
+    return pararCronometro;
   }, []);
 
   useEffect(() => {
     if (questoes.length > 0) {
       const q = questoes[currentQuestionIndex];
-
       const alternativasCompletas = [
         q.resposta1,
         q.resposta2,
         q.resposta3,
         q.resposta4,
-        q.respostaCorreta
+        q.respostaCorreta,
       ];
-
-      const alternativasEmbaralhadas = alternativasCompletas.sort(() => Math.random() - 0.5);
-
-      setAlternativas(alternativasEmbaralhadas);
+      const embaralhadas = alternativasCompletas.sort(() => Math.random() - 0.5);
+      setAlternativas(embaralhadas);
     }
   }, [currentQuestionIndex, questoes]);
+
+  const iniciarCronometro = () => {
+    pararCronometro();
+    setTempo(0);
+    timerRef.current = setInterval(() => {
+      setTempo((prev) => prev + 1);
+    }, 1000);
+  };
+
+  const pararCronometro = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+  };
+
+  const salvarRanking = async () => {
+  const jogadorId = await AsyncStorage.getItem('jogadorId');
+  const nomeJogador = await AsyncStorage.getItem('nomeJogador');
+
+  if (jogadorId && nomeJogador) {
+    await saveOrUpdateRanking({
+      idJogador: Number(jogadorId),
+      nomeJogador: nomeJogador,
+      qntdPontos: score,
+      qntdTempo: tempo,
+    });
+  } else {
+    console.log('❌ Não foi possível obter dados do jogador para salvar ranking');
+  }
+};
+
 
   const carregarQuestoes = async () => {
     try {
@@ -51,16 +91,13 @@ export default function FaseScreen() {
       const todasQuestoes = [...faceis, ...medias, ...dificeis];
 
       if (todasQuestoes.length < 12) {
-        Alert.alert(
-          'Erro',
-          `Banco de dados não possui questões suficientes.\nPor favor, cadastre pelo menos 4 fáceis, 4 médias e 4 difíceis.`
-        );
+        Alert.alert('Erro', 'Não há questões suficientes no banco.');
         return;
       }
 
       setQuestoes(todasQuestoes);
     } catch (error) {
-      Alert.alert('Erro ao carregar questões do banco.');
+      Alert.alert('Erro', 'Erro ao carregar questões.');
     }
   };
 
@@ -78,16 +115,20 @@ export default function FaseScreen() {
       setScore(newScore);
     }
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (isCorrect) {
         if (currentQuestionIndex === questoes.length - 1) {
-          Alert.alert('Parabéns!', `Você ganhou R$${prizeMoney[currentQuestionIndex].toLocaleString('pt-BR')}!`);
+          pararCronometro();
+          await salvarRanking();
+          Alert.alert('Parabéns!', `Você ganhou R$${prizeMoney[currentQuestionIndex].toLocaleString('pt-BR')}!Tempo total: ${tempo} segundos.`);
           resetGame();
         } else {
           setCurrentQuestionIndex((prev) => prev + 1);
         }
       } else {
-        Alert.alert('Fim de jogo!', `Você errou! Seu prêmio final é R$${score.toLocaleString('pt-BR')}.`);
+        pararCronometro();
+        await salvarRanking();
+        Alert.alert('Fim de jogo!', `Você errou! Seu prêmio final é R$${score.toLocaleString('pt-BR')}Tempo total: ${tempo} segundos.`);
         resetGame();
       }
       setSelectedAnswer(null);
@@ -97,12 +138,10 @@ export default function FaseScreen() {
 
   const handleFiftyFifty = () => {
     if (usedFiftyFifty) return;
-
     const questaoAtual = questoes[currentQuestionIndex];
     const alternativasErradas = alternativas.filter(alt => alt !== questaoAtual.respostaCorreta);
     const alternativasParaExcluir = alternativasErradas.slice(0, 2);
     const novasAlternativas = alternativas.filter(alt => !alternativasParaExcluir.includes(alt));
-
     setAlternativas(novasAlternativas);
     setUsedFiftyFifty(true);
   };
@@ -111,10 +150,12 @@ export default function FaseScreen() {
     if (usedSkip) return;
 
     if (currentQuestionIndex === questoes.length - 1) {
-      Alert.alert('Fim de jogo!', `Você ganhou R$${score.toLocaleString('pt-BR')}!`);
+      pararCronometro();
+      salvarRanking();
+      Alert.alert('Fim de jogo!', `Você ganhou R$${score.toLocaleString('pt-BR')}!Tempo total: ${tempo} segundos`);
       resetGame();
     } else {
-      setCurrentQuestionIndex(prev => prev + 1);
+      setCurrentQuestionIndex((prev) => prev + 1);
       setUsedSkip(true);
     }
   };
@@ -126,6 +167,7 @@ export default function FaseScreen() {
     setUsedSkip(false);
     setSelectedAnswer(null);
     setShowFeedback(false);
+    iniciarCronometro();
     carregarQuestoes();
   };
 
@@ -172,6 +214,10 @@ export default function FaseScreen() {
       imageStyle={{ opacity: 0.18 }}
     >
       <View style={styles.overlay}>
+        <Text style={{ color: '#FFD166', textAlign: 'center', marginBottom: 5, fontWeight: 'bold' }}>
+          ⏱️ Tempo: {tempo}s
+        </Text>
+
         {renderFases()}
 
         <View style={styles.questionBox}>
@@ -221,6 +267,7 @@ export default function FaseScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   loading: {
     flex: 1,
@@ -261,7 +308,7 @@ const styles = StyleSheet.create({
   },
   faseText: {
     fontSize: 15,
-    color: 'black', // 🔥 Alterado para preto
+    color: 'black',
     fontWeight: 'bold',
   },
   bolinha: {

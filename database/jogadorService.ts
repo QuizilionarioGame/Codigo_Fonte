@@ -1,4 +1,5 @@
 import { useSQLiteContext } from 'expo-sqlite';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type JogadorDatabase = {
   idJogador: number;
@@ -10,11 +11,55 @@ export type JogadorDatabase = {
   senhaJogador: string;
 };
 
+export async function getJogadorId(): Promise<number | null> {
+  const id = await AsyncStorage.getItem('jogadorId');
+  return id ? parseInt(id, 10) : null;
+}
+
 export function useJogadorDatabase() {
   const database = useSQLiteContext();
 
+  // ✅ SALVAR LOGIN NA SESSÃO
+  async function saveUserSession(email: string) {
+    await AsyncStorage.setItem('userEmail', email);
+  }
+
+  // ✅ PEGAR JOGADOR ATUAL LOGADO
+  async function getJogadorLogado() {
+    const email = await AsyncStorage.getItem('userEmail');
+    if (!email) return null;
+
+    const result = await database.getFirstAsync<JogadorDatabase>(
+      'SELECT * FROM Jogador WHERE emailAluno = ? OR emailAdmin = ?',
+      [email, email]
+    );
+    return result;
+  }
+
   
-  // CREATE
+
+  // ✅ SAIR DA SESSÃO
+  async function logout() {
+    await AsyncStorage.removeItem('userEmail');
+    
+  }
+
+  // ✅ LOGIN
+  async function checkLogin(email: string, senha: string) {
+    const query = `
+      SELECT * FROM Jogador 
+      WHERE (emailAdmin = ? OR emailAluno = ?) 
+      AND senhaJogador = ?
+    `;
+    const result = await database.getFirstAsync<JogadorDatabase>(query, [email, email, senha]);
+    if (result) {
+      await saveUserSession(email);
+    
+    }
+    return result;
+  }
+
+  // ✅ CREATE
   async function create(data: Omit<JogadorDatabase, 'idJogador'>) {
     const statement = await database.prepareAsync(
       `INSERT INTO Jogador 
@@ -41,7 +86,7 @@ export function useJogadorDatabase() {
     }
   }
 
-  // GET ALL
+  // ✅ GET ALL
   async function getAll() {
     try {
       const query = 'SELECT * FROM Jogador ORDER BY nomeJogador ASC';
@@ -52,7 +97,7 @@ export function useJogadorDatabase() {
     }
   }
 
-  // SEARCH by name (contém letras digitadas)
+  // ✅ SEARCH BY NAME
   async function searchByName(nome: string) {
     try {
       const query =
@@ -67,7 +112,7 @@ export function useJogadorDatabase() {
     }
   }
 
-  // SHOW (buscar por id)
+  // ✅ SHOW (buscar por id)
   async function show(idJogador: number) {
     try {
       const query = 'SELECT * FROM Jogador WHERE idJogador = ?';
@@ -80,7 +125,7 @@ export function useJogadorDatabase() {
     }
   }
 
-  // UPDATE
+  // ✅ UPDATE
   async function update(data: JogadorDatabase) {
     const statement = await database.prepareAsync(
       `UPDATE Jogador 
@@ -111,7 +156,7 @@ export function useJogadorDatabase() {
     }
   }
 
-  // DELETE
+  // ✅ DELETE
   async function remove(idJogador: number) {
     try {
       await database.execAsync(
@@ -121,19 +166,17 @@ export function useJogadorDatabase() {
       throw error;
     }
   }
-  // Função de login
-  async function checkLogin(email: string, senha: string) {
-    const query = `
-      SELECT * FROM Jogador 
-      WHERE (emailAdmin = ? OR emailAluno = ?) 
-      AND senhaJogador = ?
-    `;
 
-    const result = await database.getFirstAsync(query, [email, email, senha]);
-
-    return result; 
-  }
-
-
-  return { create, getAll, searchByName, update, remove, checkLogin, show };
+  return {
+    create,
+    getAll,
+    searchByName,
+    update,
+    remove,
+    checkLogin,
+    getJogadorLogado,
+    saveUserSession,
+    logout,
+    show
+  };
 }
