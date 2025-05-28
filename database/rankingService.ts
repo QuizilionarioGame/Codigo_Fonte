@@ -63,6 +63,19 @@ export function useRankingDatabase() {
       return null;
     }
   }
+  // 🔥 Buscar todos do ranking ordenados
+    async function getAllRanking() {
+    const query = `
+    SELECT Ranking.*, Jogador.ra, Jogador.serie 
+    FROM Ranking 
+    INNER JOIN Jogador 
+    ON Jogador.idJogador = Ranking.Jogador_idJogador
+    ORDER BY qntdPontos DESC, qntdTempo ASC
+  `;
+  const result = await database.getAllAsync<any>(query);
+  return result;
+}
 
-  return { saveOrUpdateRanking, getRankingByJogadorId };
+
+  return { saveOrUpdateRanking, getRankingByJogadorId, getAllRanking  };
 }

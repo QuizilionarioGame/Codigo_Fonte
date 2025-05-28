@@ -7,6 +7,7 @@ import {
   Text,
   View,
   Alert,
+  Button,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRankingDatabase } from '@/database/rankingService';
@@ -120,6 +121,9 @@ export default function RankAluno() {
           <Text style={styles.label}>Melhor Tempo:</Text>
           <Text style={styles.value}>{stats.melhorTempo} segundos</Text>
         </View>
+      </View>
+      <View style={{ marginTop: 20 }}>
+                    <Button title="Voltar" onPress={() => router.back()} />
       </View>
     </ScrollView>
   );
