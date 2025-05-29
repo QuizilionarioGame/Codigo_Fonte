@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router';
 import React from 'react';
-import { Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Button, Image, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function HomeProfessor() {
   const router = useRouter();
@@ -55,7 +55,8 @@ export default function HomeProfessor() {
         >
           <Text style={styles.buttonTextBlack}>Sair</Text>
         </TouchableOpacity>
-
+        
+      
       </View>
     </View>
   );

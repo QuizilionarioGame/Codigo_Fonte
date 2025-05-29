@@ -1,4 +1,5 @@
 {
+  "assetBundlePatterns": ["assets/*"],
   "expo": {
     "name": "ProjetoIntegrador",
     "slug": "ProjetoIntegrador",

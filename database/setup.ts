@@ -5,6 +5,12 @@ export const createTables = () => {
 
   db.withTransactionSync(() => {
     db.execAsync(`
+
+       DROP TABLE IF EXISTS Partida;
+      DROP TABLE IF EXISTS Ranking;
+      DROP TABLE IF EXISTS Questoes;
+      DROP TABLE IF EXISTS Jogador;
+
       CREATE TABLE IF NOT EXISTS Jogador (
         idJogador INTEGER PRIMARY KEY AUTOINCREMENT,
         nomeJogador TEXT UNIQUE NOT NULL,
@@ -28,7 +34,7 @@ export const createTables = () => {
 
       CREATE TABLE IF NOT EXISTS Questoes (
         idQuestoes INTEGER PRIMARY KEY AUTOINCREMENT,
-        materia INTEGER,
+        materia TEXT,
         dificuldade TEXT,
         pergunta TEXT,
         resposta1 TEXT,
@@ -46,7 +52,81 @@ export const createTables = () => {
         FOREIGN KEY (idQuestoes) REFERENCES Questoes(idQuestoes)
       );
     `);
+
+    db.getFirstAsync('SELECT COUNT(*) as total FROM Questoes').then((result) => {
+    const { total } = result as { total: number };
+    if (total === 0) {
+        db.execAsync(`
+              INSERT INTO Questoes (materia, dificuldade, pergunta, resposta1, resposta2, resposta3, resposta4, respostaCorreta) VALUES
+              ('Português', 'Facil', 'Qual das palavras a seguir está escrita corretamente?', 'resgistro', 'registro', 'regístro', 'regitro', 'registro'),
+              ('Português', 'Facil', 'Em qual frase há erro de concordância verbal?', 'Os alunos chegaram atrasados.', 'Os livros foram guardados.', 'Houve muitas reclamações.', 'Os dados foi analisado.', 'Os dados foi analisado.'),
+              ('Português', 'Facil', 'Qual alternativa apresenta um verbo no pretérito perfeito?', 'Comeria', 'Estudei', 'Estudava', 'Estudaria', 'Estudei'),
+              ('Português', 'Facil', 'Qual é o antônimo de “sincero”?', 'Amável', 'Bondoso', 'Verdadeiro', 'Falso', 'Falso'),
+
+              ('Português', 'Medio', 'Assinale a oração subordinada adverbial causal:', 'Choveu muito, por isso não saí.', 'Como estava cansado, não fui à festa.', 'Se chover, não saio.', 'Embora cansado, fui ao trabalho.', 'Como estava cansado, não fui à festa.'),
+              ('Português', 'Medio', 'Na frase "Ele viu o livro que você comprou", o termo "que" é:', 'Pronome possessivo', 'Preposição', 'Pronome relativo', 'Conjunção', 'Pronome relativo'),
+              ('Português', 'Medio', 'Qual das opções contém uma figura de linguagem chamada “metáfora”?', 'A lua estava no céu.', 'Seus olhos são duas estrelas.', 'A casa era pequena.', 'Ele correu muito.', 'Seus olhos são duas estrelas.'),
+              ('Português', 'Medio', 'Em qual alternativa há um erro de regência?', 'Assistimos ao filme.', 'Preferimos viajar a descansar.', 'Cheguei a tempo.', 'Esqueci o livro em casa.', 'Preferimos viajar a descansar.'),
+
+              ('Matemática', 'Facil', 'Quanto é 2 + 2?', '3', '4', '5', '6', '4'),
+              ('Matemática', 'Facil', 'Qual é o dobro de 7?', '14', '10', '12', '9', '14'),
+              ('Matemática', 'Facil', 'Qual é o valor de x em: x + 5 = 10?', '3', '4', '5', '6', '5'),
+              ('Matemática', 'Facil', 'Quanto é 3 x 5?', '15', '8', '10', '12', '15'),
+
+              ('Matemática', 'Medio', 'Qual é a raiz quadrada de 81?', '7', '8', '9', '10', '9'),
+              ('Matemática', 'Medio', 'Se um triângulo tem lados 3, 4 e 5, ele é:', 'Equilátero', 'Isósceles', 'Escaleno', 'Retângulo', 'Retângulo'),
+              ('Matemática', 'Medio', 'Quanto é 5² + 2²?', '25', '29', '28', '30', '29'),
+              ('Matemática', 'Medio', 'Se a = 2 e b = 3, quanto é ab + b²?', '15', '14', '13', '12', '15'),
+
+              ('Português', 'Dificil', 'Assinale a alternativa com um erro de colocação pronominal.', 'Me emprestou o livro.', 'Emprestou-me o livro.', 'Deu-me o presente.', 'Mandou-me embora.', 'Me emprestou o livro.'),
+              ('Português', 'Dificil', 'Qual das palavras abaixo é um advérbio?', 'Felizmente', 'Feliz', 'Felicidade', 'Felizes', 'Felizmente'),
+              ('Português', 'Dificil', 'Qual é a função sintática de "que" na frase: "O livro que comprei é ótimo"?', 'Conjunção', 'Pronome demonstrativo', 'Pronome relativo', 'Artigo', 'Pronome relativo'),
+              ('Português', 'Dificil', 'O que caracteriza um texto dissertativo-argumentativo?', 'Uso de verbos no imperativo', 'Narrativa linear', 'Apresentação de opinião com argumentos', 'Predomínio da descrição', 'Apresentação de opinião com argumentos'),
+
+              ('Matemática', 'Dificil', 'Resolva: 2x² - 8x + 6 = 0. Qual o valor de x?', '1 e 3', '2 e 3', '1 e 2', '2 e 4', '1 e 3'),
+              ('Matemática', 'Dificil', 'A função f(x) = 2x + 1 é crescente, decrescente ou constante?', 'Constante', 'Crescente', 'Decrescente', 'Parabólica', 'Crescente'),
+              ('Matemática', 'Dificil', 'A soma dos ângulos internos de um polígono de 10 lados é:', '1440°', '1620°', '1800°', '1080°', '1440°'),
+              ('Matemática', 'Dificil', 'Qual o valor de log₂(8)?', '2', '3', '4', '1', '3');
+            `);
+
+        console.log('Questões iniciais inseridas.');
+      } else {
+        console.log('Questões já estão no banco.');
+      }
+
+
+
+    });
+
+    db.getFirstAsync("SELECT COUNT(*) as total FROM Jogador WHERE emailAluno IS NOT NULL").then((result) => {
+    const { total } = result as { total: number };
+    if (total === 0) {
+      db.execAsync(`
+        INSERT INTO Jogador (nomeJogador, ra, serie, emailAluno, senhaJogador) VALUES
+        ('Felipe', 'RA2001', 1, 'Felipe@p4ed.com', 'Felipe'),
+        ('Gustavo', 'RA2002', 2, 'Gustavo@p4ed.com', 'Gustavo');
+      `);
+      console.log('Jogadores com emailAluno inseridos.');
+    } else {
+      console.log('Jogadores com emailAluno já existentes.');
+    }
   });
+
+db.getFirstAsync("SELECT COUNT(*) as total FROM Jogador WHERE emailAdmin IS NOT NULL").then((result) => {
+    const { total } = result as { total: number };
+    if (total === 0) {
+      db.execAsync(`
+        INSERT INTO Jogador (nomeJogador, ra, serie, emailAdmin, senhaJogador) VALUES
+        ('Duarte', 'RA3001', 1, 'Duarte@sistemapoliedro.com.br', 'Duarte'),
+        ('Renato', 'RA3002', 2, 'Renato@sistemapoliedro.com.br', 'Renato');
+      `);
+      console.log('Jogadores com emailAdmin inseridos.');
+    } else {
+      console.log('Jogadores com emailAdmin já existentes.');
+    }
+  });
+
+});
 
   
 };
