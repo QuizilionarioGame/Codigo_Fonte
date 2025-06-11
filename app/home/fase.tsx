@@ -122,7 +122,7 @@ export default function FaseScreen() {
         if (currentQuestionIndex === questoes.length - 1) {
           pararCronometro();
           await salvarRanking();
-          Alert.alert('Parabéns!', `Você ganhou R$${prizeMoney[currentQuestionIndex].toLocaleString('pt-BR')}!Tempo total: ${tempo} segundos.`);
+          Alert.alert('Parabéns!', `Você ganhou R$${prizeMoney[currentQuestionIndex].toLocaleString('pt-BR')}!\nTempo total: ${tempo} segundos.`);
           resetGame();
         } else {
           setCurrentQuestionIndex((prev) => prev + 1);
@@ -130,7 +130,7 @@ export default function FaseScreen() {
       } else {
         pararCronometro();
         await salvarRanking();
-        Alert.alert('Fim de jogo!', `Você errou! Seu prêmio final é R$${score.toLocaleString('pt-BR')}Tempo total: ${tempo} segundos.`);
+        Alert.alert('Fim de jogo!', `Você errou! Seu prêmio final é R$${score.toLocaleString('pt-BR')}! \nTempo total: ${tempo} segundos.`);
         resetGame();
       }
       setSelectedAnswer(null);
@@ -154,7 +154,7 @@ export default function FaseScreen() {
     if (currentQuestionIndex === questoes.length - 1) {
       pararCronometro();
       salvarRanking();
-      Alert.alert('Fim de jogo!', `Você ganhou R$${score.toLocaleString('pt-BR')}!Tempo total: ${tempo} segundos`);
+      Alert.alert('Fim de jogo!', `Você ganhou R$${score.toLocaleString('pt-BR')}! \nTempo total: ${tempo} segundos`);
       resetGame();
     } else {
       setCurrentQuestionIndex((prev) => prev + 1);

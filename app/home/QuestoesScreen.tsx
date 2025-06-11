@@ -140,10 +140,9 @@ export default function QuestoesScreen() {
       />
       <TextInput
         style={styles.input}
-        placeholder="Matéria (número)"
+        placeholder="Matéria"
         value={materia}
         onChangeText={setMateria}
-        keyboardType="numeric"
       />
 
       <Button title={idEdit === null ? 'Salvar' : 'Atualizar'} onPress={handleSalvar} />

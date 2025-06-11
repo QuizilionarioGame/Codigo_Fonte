@@ -122,9 +122,12 @@ export default function RankAluno() {
           <Text style={styles.value}>{stats.melhorTempo} segundos</Text>
         </View>
       </View>
-      <View style={{ marginTop: 20 }}>
-                    <Button title="Voltar" onPress={() => router.back()} />
-      </View>
+      <View style={styles.botaoContainer}>
+  <Text onPress={() => router.back()} style={styles.botaoVoltar}>
+    Voltar
+  </Text>
+</View>
+
     </ScrollView>
   );
 }
@@ -137,6 +140,27 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     minHeight: '100%',
   },
+    botaoContainer: {
+    alignItems: 'center',
+    marginTop: 20,
+    marginBottom: 50,
+  },
+  botaoVoltar: {
+    backgroundColor: '#FFD166',
+    color: '#073B4C',
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    overflow: 'hidden',
+  },
+
   center: {
     flex: 1,
     justifyContent: 'center',
@@ -147,13 +171,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1976D2',
-    paddingVertical: 32,
-    paddingHorizontal: 24,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
     elevation: 4,
-    marginBottom: 40,
-    paddingTop: 60,
-    width: '100%',
+    justifyContent: 'center',
   },
   icon: {
     width: 80,
@@ -165,6 +188,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: 'white',
     alignItems: 'center',
+    marginRight: 10
   },
   card: {
     backgroundColor: '#fff',

@@ -71,9 +71,13 @@ export default function RanksScreen() {
         contentContainerStyle={styles.listContainer}
         onEndReachedThreshold={0.5}
       />
-      <View style={{ marginTop: 20 }}>
-                    <Button title="Voltar" onPress={() => router.back()} />
-      </View>
+      <View style={styles.botaoContainer}>
+  <Text onPress={() => router.back()} style={styles.botaoVoltar}>
+     Voltar
+  </Text>
+</View>
+
+
     </View>
     
   );
@@ -94,12 +98,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#1976D2',
-    paddingVertical: 32,
-    paddingHorizontal: 24,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
     borderBottomLeftRadius: 15,
+    borderBottomRightRadius: 15,
     elevation: 4,
-    marginBottom: 40,
-    paddingTop: 60,
+    justifyContent: 'center',
   },
   icon: {
     width: 80,
@@ -129,6 +133,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 8,
     borderLeftColor: '#00B4D8',
     marginHorizontal: 20,
+    marginTop:10
   },
   rankPosition: {
     fontSize: 20,
@@ -157,4 +162,25 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#EF476F',
   },
+    botaoContainer: {
+    alignItems: 'center',
+    marginTop: 30,
+    marginBottom: 50,
+  },
+  botaoVoltar: {
+    backgroundColor: '#FFD166',
+    color: '#073B4C',
+    fontSize: 18,
+    fontWeight: 'bold',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 30,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
+    elevation: 5,
+    textAlign: 'center',
+  },
+
 });
