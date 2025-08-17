@@ -4,7 +4,8 @@ https://heyzine.com/flip-book/bbccdc26bc.html
 
 # Sobre
 
-    Jogo de quiz educativo com sistema de niveis para o ensino de alunos do ensino médio sobre assuntos gerais, com design e forma similar ao jogo Show do Milhão.
+Jogo de quiz educativo com sistema de niveis para o ensino de alunos do ensino médio sobre assuntos gerais, com design e forma similar ao jogo Show do Milhão.
+
 <<<<<<< HEAD
 # Welcome to your Expo app 👋
 
