@@ -50,6 +50,6 @@ Join our community of developers creating universal apps.
 - [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
 - [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
 =======
-# Codigo_Fonte
-Aqui estará o código fonte programado para o jogo feito pela equipe chamado Quizilionário
->>>>>>> 3816ac29f6235bbbd1f5e27f737f83ce43917a18
+
+
+   Jogo de quiz educativo com sistema de niveis para o ensino de alunos do ensino médio sobre assuntos gerais, com design e forma similar ao jogo Show do Milhão.
